@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   MEDIDAS_EJEMPLO,
+  aconsejarTalla,
   colorDePrenda,
+  contornoDeReferencia,
   estimarCuerpo,
   evaluarAjuste,
   medidasDeTalla,
@@ -11,7 +13,10 @@ import {
   tablaDeTallas,
   tipoDePrenda,
   validarMedidas,
+  zonaDeReferencia,
 } from './probador';
+
+const MEDIDAS_CUERPO_EJEMPLO = estimarCuerpo(MEDIDAS_EJEMPLO);
 
 describe('validarMedidas', () => {
   it('acepta medidas dentro de rango', () => {
@@ -278,10 +283,56 @@ describe('recomendarTalla', () => {
       const talla = recomendarTalla(cuerpo, 'polera');
       const ajuste = evaluarAjuste(cuerpo, 'polera', talla)!;
       const tabla = tablaDeTallas('polera');
-      const contorno = cuerpo.pecho;
+      const contorno = contornoDeReferencia(cuerpo, 'polera');
       const dentroDeTabla = contorno >= tabla[0]!.desde && contorno < tabla[tabla.length - 1]!.hasta;
       if (dentroDeTabla) expect(ajuste.ancho).toBe('justa');
     }
+  });
+
+  it('arriba elige por el abdomen cuando es mayor que el pecho', () => {
+    const conAbdomen = estimarCuerpo({ altura: 170, peso: 120 });
+    expect(conAbdomen.cintura).toBeGreaterThan(conAbdomen.pecho);
+    expect(zonaDeReferencia(conAbdomen, 'polera')).toBe('abdomen');
+    expect(contornoDeReferencia(conAbdomen, 'polera')).toBe(conAbdomen.cintura);
+    expect(zonaDeReferencia(MEDIDAS_CUERPO_EJEMPLO, 'polera')).toBe('pecho');
+    expect(zonaDeReferencia(conAbdomen, 'pantalon')).toBe('cintura');
+    // La talla que alcanza para el pecho no rodea el abdomen.
+    const porPecho = tablaDeTallas('polera').find((t) => conAbdomen.pecho >= t.desde && conAbdomen.pecho < t.hasta)!.talla;
+    expect(evaluarAjuste(conAbdomen, 'polera', porPecho)?.ancho).toBe('apretada');
+  });
+});
+
+describe('aconsejarTalla', () => {
+  it('sin consejo si la talla puesta queda justa', () => {
+    const promedio = estimarCuerpo({ altura: 175, peso: 78 });
+    expect(aconsejarTalla(promedio, 'polera', 'M')).toBeNull();
+  });
+
+  it('al subir de peso con la misma talla, aconseja subir a la que calza', () => {
+    const antes = estimarCuerpo({ altura: 170, peso: 70 });
+    expect(recomendarTalla(antes, 'polera')).toBe('M');
+    const despues = estimarCuerpo({ altura: 170, peso: 85 });
+    expect(evaluarAjuste(despues, 'polera', 'M')?.ancho).toBe('apretada');
+    const consejo = aconsejarTalla(despues, 'polera', 'M')!;
+    expect(consejo).toEqual({ cambio: 'subir', talla: recomendarTalla(despues, 'polera'), calza: true });
+    expect(evaluarAjuste(despues, 'polera', consejo.talla!)?.ancho).toBe('justa');
+  });
+
+  it('al bajar de peso aconseja bajar de talla', () => {
+    const delgado = estimarCuerpo({ altura: 170, peso: 55 });
+    expect(aconsejarTalla(delgado, 'polera', 'XXL')).toEqual({ cambio: 'bajar', talla: recomendarTalla(delgado, 'polera'), calza: true });
+  });
+
+  it('si ninguna calza, ofrece la del extremo; en el extremo, ninguna', () => {
+    const muyGrande = estimarCuerpo({ altura: 170, peso: 170 });
+    expect(aconsejarTalla(muyGrande, 'polera', 'M')).toEqual({ cambio: 'subir', talla: 'XXXL', calza: false });
+    expect(aconsejarTalla(muyGrande, 'polera', 'XXXL')).toEqual({ cambio: 'subir', talla: null, calza: false });
+  });
+
+  it('un pantalón apretado de cadera aconseja la primera talla que ya no aprieta, aunque sobre de cintura', () => {
+    const conCadera = estimarCuerpo({ altura: 175, peso: 78, cintura: 80, cadera: 110 });
+    expect(aconsejarTalla(conCadera, 'pantalon', '42')).toEqual({ cambio: 'subir', talla: '46', calza: true });
+    expect(evaluarAjuste(conCadera, 'pantalon', '44')?.ancho).toBe('apretada');
   });
 });
 

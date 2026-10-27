@@ -293,7 +293,14 @@ export function crearPrendaReal(
   const partes = mallas.map((malla) => ({ malla, posiciones: deformar(malla, valores, escala) }));
   const cobertura =
     calibrada.parte === 'arriba'
-      ? ajustarArriba(partes.map((p) => p.posiciones), calibrada, cuerpo, talla, escala, posicionesDelCuerpo)
+      ? ajustarArriba(
+          partes.map((p) => p.posiciones),
+          calibrada,
+          cuerpo,
+          talla,
+          { prenda: mallas.map((m) => m.base), cuerpo: modelo.cuerpo.base, pecho: interpolar(modelo.calibracion.tablas.pecho, 'pecho', 0) },
+          posicionesDelCuerpo,
+        )
       : ajustarAbajo(partes.map((p) => p.posiciones), calibrada, cuerpo, talla);
   // Lo que quede dentro del cuerpo (un abdomen o un brazo más grueso que la tela) sale a la piel.
   if (posicionesDelCuerpo) sacarDelCuerpo(partes.map((p) => p.posiciones), posicionesDelCuerpo, modelo.cuerpo.indices);
@@ -301,7 +308,7 @@ export function crearPrendaReal(
     otra.traverse((hijo) => {
       if (!(hijo instanceof THREE.Mesh)) return;
       const geometria = hijo.geometry as THREE.BufferGeometry;
-      sacarDelCuerpo(partes.map((p) => p.posiciones), geometria.getAttribute('position').array as Float32Array, geometria.getIndex(), SEPARACION_CAPAS);
+      sacarDelCuerpo(partes.map((p) => p.posiciones), geometria.getAttribute('position').array as Float32Array, geometria.getIndex(), SEPARACION_CAPAS, 1);
     });
   }
 
@@ -320,13 +327,25 @@ const SEPARACION_COLISION = 0.006;
 const SEPARACION_CAPAS = 0.004;
 /** Lado de cada celda de la grilla con que se buscan los vértices del cuerpo, en metros. */
 const CELDA = 0.03;
+/**
+ * Cuántas celdas a la redonda se busca la piel más cercana, como máximo. Entre dos prendas se busca
+ * solo en las vecinas: más lejos, la de abajo ya no está debajo (la pretina del pantalón no está
+ * bajo el abdomen de la polera).
+ */
+const ALCANCE_MAXIMO = 5;
 
 /**
  * Colisión de la tela con el cuerpo: cada punto de la prenda que esté dentro del cuerpo (o a menos
  * de `SEPARACION_COLISION` de la piel) se lleva afuera, a lo largo de la normal de la piel más
  * cercana. Así ningún trozo de piel atraviesa la tela, sea cual sea la talla o el cuerpo.
  */
-function sacarDelCuerpo(posiciones: Float32Array[], cuerpo: Float32Array, indices: THREE.BufferAttribute | null, separacion = SEPARACION_COLISION): void {
+function sacarDelCuerpo(
+  posiciones: Float32Array[],
+  cuerpo: Float32Array,
+  indices: THREE.BufferAttribute | null,
+  separacion = SEPARACION_COLISION,
+  alcanceMaximo = ALCANCE_MAXIMO,
+): void {
   const malla = new THREE.BufferGeometry();
   malla.setAttribute('position', new THREE.BufferAttribute(cuerpo, 3));
   if (indices) malla.setIndex(indices);
@@ -351,14 +370,20 @@ function sacarDelCuerpo(posiciones: Float32Array[], cuerpo: Float32Array, indice
     const cz = Math.floor(z / CELDA);
     let cercano = -1;
     let distancia = Infinity;
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dy = -1; dy <= 1; dy++) {
-        for (let dz = -1; dz <= 1; dz++) {
-          for (const j of grilla.get(`${cx + dx},${cy + dy},${cz + dz}`) ?? []) {
-            const d = (cuerpo[j]! - x) ** 2 + (cuerpo[j + 1]! - y) ** 2 + (cuerpo[j + 2]! - z) ** 2;
-            if (d < distancia) {
-              distancia = d;
-              cercano = j;
+    // Primero las celdas vecinas; si no hay piel cerca (la tela quedó muy adentro de un abdomen
+    // grande), se busca más lejos.
+    for (let alcance = 1; cercano < 0 && alcance <= alcanceMaximo; alcance++) {
+      for (let dx = -alcance; dx <= alcance; dx++) {
+        for (let dy = -alcance; dy <= alcance; dy++) {
+          for (let dz = -alcance; dz <= alcance; dz++) {
+            // Las celdas ya revisadas con un alcance menor se saltan.
+            if (alcance > 1 && Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz)) < alcance) continue;
+            for (const j of grilla.get(`${cx + dx},${cy + dy},${cz + dz}`) ?? []) {
+              const d = (cuerpo[j]! - x) ** 2 + (cuerpo[j + 1]! - y) ** 2 + (cuerpo[j + 2]! - z) ** 2;
+              if (d < distancia) {
+                distancia = d;
+                cercano = j;
+              }
             }
           }
         }
@@ -399,50 +424,25 @@ function ajustarArriba(
   calibrada: PrendaCalibrada,
   cuerpo: MedidasCuerpo,
   talla: TallaPrenda,
-  escala: number,
+  /** La prenda y el cuerpo sin deformar, y el pecho de ese cuerpo en centímetros. */
+  base: { prenda: Float32Array[]; cuerpo: Float32Array; pecho: number },
   posicionesDelCuerpo?: Float32Array,
 ): (x: number, y: number, z: number) => boolean {
   const { ajuste } = calibrada;
-  let abajo = Infinity;
-  let arriba = -Infinity;
-  cadaVertice(posiciones, (p, i) => {
-    abajo = Math.min(abajo, p[i + 1]!);
-    arriba = Math.max(arriba, p[i + 1]!);
-  });
-  const pecho = abajo + ((ajuste.alturaMedida - ajuste.bordeInferior) / ajuste.largoVertical) * (arriba - abajo);
-  // Bajo la axila empieza el tronco de la prenda; arriba quedan hombros, cuello y mangas.
-  const axila = pecho + (arriba - pecho) * 0.3;
+  const { abajo, arriba, pecho, axila } = alturasDelTronco(posiciones, ajuste);
 
   // Nunca queda a menos de 2 cm de holgura del pecho.
   const holguraTalla = Math.max(talla.contorno - cuerpo.pecho, 2);
   const factor = (cuerpo.pecho + holguraTalla) / (cuerpo.pecho + Math.max(ajuste.holgura, 2));
-  const semiancho = ((cuerpo.pecho + Math.max(ajuste.holgura, 2)) / 100 / 5.47) * escala;
-  let centroZ = 0;
-  let enTronco = 0;
-  cadaVertice(posiciones, (p, i) => {
-    if (p[i + 1]! < pecho) {
-      centroZ += p[i + 2]!;
-      enTronco++;
-    }
-  });
-  centroZ /= enTronco || 1;
-  // Cuánto es tronco cada vértice (1) o manga (0), según dónde estaba antes de ensancharlo: en una
-  // talla ancha los costados del tronco quedan más afuera que el límite. Donde el cuerpo deja ver
-  // el espacio entre el torso y el brazo, el límite va al medio de ese espacio; más arriba, cerca de
-  // la axila, se usa un ancho fijo.
-  const limiteTronco = posicionesDelCuerpo ? separacionTronco(posicionesDelCuerpo, axila) : () => null;
-  const tronco = posiciones.map((p) => new Float32Array(p.length / 3));
+  const centroZ = centroDelTronco(posiciones, pecho);
+  // Qué es tronco y qué es manga se decide en el modelo sin deformar (ver `separarTronco`).
+  const { tronco, brazos } = separarTronco(base.prenda, base.cuerpo, ajuste, base.pecho);
   cadaVertice(posiciones, (p, i, parte) => {
     const x = p[i]!;
     const y = p[i + 1]!;
     // Pleno bajo el pecho, se desvanece hacia la axila y hacia los costados (donde nacen las mangas).
     const vertical = Math.min(Math.max((axila - y) / (axila - pecho), 0), 1);
-    const limite = limiteTronco(y);
-    const lateral =
-      limite === null
-        ? Math.min(Math.max((semiancho * 1.25 - Math.abs(x)) / (semiancho * 0.25), 0), 1)
-        : Math.min(Math.max((limite + TRANSICION_MANGA / 2 - Math.abs(x)) / TRANSICION_MANGA, 0), 1);
-    tronco[parte]![i / 3] = lateral;
+    const lateral = tronco[parte]![i / 3]!;
     const s = 1 + (factor - 1) * vertical * lateral;
     p[i] = x * s;
     p[i + 2] = centroZ + (p[i + 2]! - centroZ) * s;
@@ -463,12 +463,31 @@ function ajustarArriba(
     if (y < pecho) p[i + 1] = y - alargue * Math.min((pecho - y) / (pecho - bastaActual), 1) * pesoTronco(i, parte);
   });
 
+  // Una talla chica no alcanza a rodear el abdomen: la tela se sube hasta donde el cuerpo todavía
+  // cabe en ella (estirándose un poco) y deja ver la piel de más abajo. Si el que no cabe es el
+  // pecho, la tela estirada a lo ancho se acorta. La chaqueta no: es rígida y lleva una camisa
+  // debajo, que se cruzaría con ella; una chaqueta chica se ve ceñida.
+  if (posicionesDelCuerpo && talla.tipo !== 'chaqueta') {
+    const tope = alturaQueNoCabe(posicionesDelCuerpo, pecho, centroZ, brazos, (talla.contorno / 100) * ESTIRAMIENTO);
+    const basta = bastaActual - alargue;
+    const porAbdomen = tope > basta ? (pecho - tope) / (pecho - basta) : 1;
+    const porPecho = 1 - (Math.max(cuerpo.pecho - talla.contorno, 0) / talla.contorno) * ACORTE_POR_ESTIRAMIENTO;
+    // La tela no se recoge más que hasta la mitad del tronco.
+    const k = Math.max(Math.min(porAbdomen, porPecho), COBERTURA_MINIMA);
+    if (k < 1) {
+      cadaVertice(posiciones, (p, i, parte) => {
+        const y = p[i + 1]!;
+        if (y < pecho) p[i + 1] = y + (pecho - (pecho - y) * k - y) * pesoTronco(i, parte);
+      });
+    }
+  }
+
   const sectores = 48;
   const sector = (x: number, z: number) => Math.floor((Math.atan2(x, z - centroZ) / (2 * Math.PI) + 0.5) * sectores) % sectores;
   // La chaqueta es estructurada y lleva una camisa debajo: no cae como una polera, y hacer caer
   // ambas capas las cruza.
   if (posicionesDelCuerpo && talla.tipo !== 'chaqueta') {
-    dejarCaer(posiciones, posicionesDelCuerpo, { pecho, axila, centroZ, semiancho, pesoTronco, sector, sectores });
+    dejarCaer(posiciones, posicionesDelCuerpo, { pecho, axila, centroZ, brazos, pesoTronco, sector, sectores });
   }
 
   // Altura de la basta en cada dirección alrededor del cuerpo: no es pareja (los costados suelen
@@ -493,10 +512,116 @@ function ajustarArriba(
   };
 }
 
+/**
+ * Alturas de una prenda de arriba: sus extremos, la del pecho (la de la calibración, llevada al
+ * alto de la prenda) y la de la axila, donde empieza el tronco; más arriba quedan hombros, cuello
+ * y mangas.
+ */
+function alturasDelTronco(posiciones: Float32Array[], ajuste: AjustePrenda): { abajo: number; arriba: number; pecho: number; axila: number } {
+  let abajo = Infinity;
+  let arriba = -Infinity;
+  cadaVertice(posiciones, (p, i) => {
+    abajo = Math.min(abajo, p[i + 1]!);
+    arriba = Math.max(arriba, p[i + 1]!);
+  });
+  const pecho = abajo + ((ajuste.alturaMedida - ajuste.bordeInferior) / ajuste.largoVertical) * (arriba - abajo);
+  return { abajo, arriba, pecho, axila: pecho + (arriba - pecho) * 0.3 };
+}
+
+/** Profundidad media del tronco de la prenda bajo el pecho: el centro alrededor del que se ensancha. */
+function centroDelTronco(posiciones: Float32Array[], pecho: number): number {
+  let suma = 0;
+  let cuenta = 0;
+  cadaVertice(posiciones, (p, i) => {
+    if (p[i + 1]! < pecho) {
+      suma += p[i + 2]!;
+      cuenta++;
+    }
+  });
+  return suma / (cuenta || 1);
+}
+
+/**
+ * Cuánto es tronco cada vértice de la prenda (1) o manga (0), y qué vértices del cuerpo son de los
+ * brazos. Se decide en el modelo sin deformar, el cuerpo promedio: ahí siempre hay espacio entre
+ * el torso y el brazo. En un cuerpo de mucho peso el brazo queda pegado al torso, y los costados
+ * de la prenda se confundían con mangas: quedaban a medio ensanchar, como alas.
+ *
+ * Donde hay espacio entre el torso y el brazo, el límite va al medio de ese espacio; más arriba,
+ * cerca de la axila, se usa un ancho fijo.
+ */
+function separarTronco(prenda: Float32Array[], cuerpo: Float32Array, ajuste: AjustePrenda, pechoCuerpo: number): { tronco: Float32Array[]; brazos: Uint8Array } {
+  const { axila } = alturasDelTronco(prenda, ajuste);
+  const semiancho = (pechoCuerpo + Math.max(ajuste.holgura, 2)) / 100 / 5.47;
+  const limiteTronco = separacionTronco(cuerpo, axila);
+  const tronco = prenda.map((p) => {
+    const pesos = new Float32Array(p.length / 3);
+    for (let i = 0; i < p.length; i += 3) {
+      const x = Math.abs(p[i]!);
+      const limite = limiteTronco(p[i + 1]!);
+      pesos[i / 3] =
+        limite === null
+          ? Math.min(Math.max((semiancho * 1.25 - x) / (semiancho * 0.25), 0), 1)
+          : Math.min(Math.max((limite + TRANSICION_MANGA / 2 - x) / TRANSICION_MANGA, 0), 1);
+    }
+    return pesos;
+  });
+  const brazos = new Uint8Array(cuerpo.length / 3);
+  for (let i = 0; i < cuerpo.length; i += 3) {
+    const limite = cuerpo[i + 1]! < axila ? limiteTronco(cuerpo[i + 1]!) : null;
+    brazos[i / 3] = limite !== null && Math.abs(cuerpo[i]!) > limite ? 1 : 0;
+  }
+  return { tronco, brazos };
+}
+
+/** Cuánto se estira el tejido de una polera alrededor del cuerpo antes de subirse. */
+const ESTIRAMIENTO = 1.06;
+/** Cuánto se acorta el tronco por cada parte en que el pecho supera a la prenda (10 % más de pecho: 20 % más corta). */
+const ACORTE_POR_ESTIRAMIENTO = 2;
+/** Parte del tronco bajo el pecho que sigue cubriendo una polera chica, como mínimo. */
+const COBERTURA_MINIMA = 0.5;
+
+/**
+ * Altura más alta bajo el pecho en que el contorno del tronco supera `contornoMaximo` (en metros),
+ * o `-Infinity` si cabe entero. El contorno de cada franja se mide alrededor del centro, con el
+ * radio más afuera en cada dirección, sin contar los vértices de los brazos (marcados en `brazos`).
+ */
+function alturaQueNoCabe(cuerpo: Float32Array, pecho: number, centroZ: number, brazos: Uint8Array, contornoMaximo: number): number {
+  const sectores = 48;
+  const franjas = new Map<number, Float32Array>();
+  for (let i = 0; i < cuerpo.length; i += 3) {
+    const x = cuerpo[i]!;
+    const y = cuerpo[i + 1]!;
+    if (y > pecho || brazos[i / 3]) continue;
+    const z = cuerpo[i + 2]! - centroZ;
+    const f = Math.floor(y / FRANJA);
+    let fila = franjas.get(f);
+    if (!fila) franjas.set(f, (fila = new Float32Array(sectores)));
+    const s = Math.floor((Math.atan2(x, z) / (2 * Math.PI) + 0.5) * sectores) % sectores;
+    fila[s] = Math.max(fila[s]!, Math.hypot(x, z));
+  }
+  const desdeArriba = [...franjas.keys()].sort((a, b) => b - a);
+  for (const f of desdeArriba) {
+    const fila = franjas.get(f)!;
+    // Las direcciones sin vértices toman el radio de la vecina; si la franja tiene pocas, no se mide.
+    if (fila.filter((r) => r > 0).length < sectores / 2) continue;
+    let contorno = 0;
+    for (let s = 0; s < sectores; s++) {
+      const r = fila[s] || Math.max(fila[(s + 1) % sectores]!, fila[(s - 1 + sectores) % sectores]!);
+      contorno += (r * 2 * Math.PI) / sectores;
+    }
+    if (contorno > contornoMaximo) return (f + 1) * FRANJA;
+  }
+  return -Infinity;
+}
+
 /** Separación mínima entre la tela y la piel, en metros. */
 const SEPARACION_TELA = 0.008;
-/** Cuánto más allá de su caída puede apoyarse la tela sobre el cuerpo, en metros. */
-const APOYO_MAXIMO = 0.03;
+/**
+ * Cuánto más allá de su caída puede apoyarse la tela sobre el cuerpo, en metros: lo que sobresale
+ * un abdomen grande. Los brazos no cuentan (ver `separarTronco`).
+ */
+const APOYO_MAXIMO = 0.2;
 /** Alto de cada franja con que se mide el cuerpo, en metros. */
 const FRANJA = 0.02;
 
@@ -512,6 +637,9 @@ const TRANSICION_MANGA = 0.01;
 /**
  * Distancia al centro que separa el torso de los brazos a cada altura bajo la axila: la mitad del
  * espacio que el cuerpo deja entre ambos. `null` donde no hay espacio (cerca de la axila).
+ *
+ * Se usa con el cuerpo promedio (ver `separarTronco`): en un abdomen grande la malla se estira y
+ * sus vértices quedan más separados que el espacio buscado.
  */
 function separacionTronco(cuerpo: Float32Array, axila: number): (y: number) => number | null {
   const porFranja = new Map<number, number[]>();
@@ -557,13 +685,13 @@ function dejarCaer(
     pecho: number;
     axila: number;
     centroZ: number;
-    semiancho: number;
+    brazos: Uint8Array;
     pesoTronco: (i: number, parte: number) => number;
     sector: (x: number, z: number) => number;
     sectores: number;
   },
 ): void {
-  const { pecho, axila, centroZ, semiancho, pesoTronco, sector, sectores } = zona;
+  const { pecho, axila, centroZ, brazos, pesoTronco, sector, sectores } = zona;
   const radio = (x: number, z: number) => Math.hypot(x, z - centroZ);
 
   // Hasta dónde llega la tela en cada dirección entre el pecho y la axila: desde ahí cuelga.
@@ -586,7 +714,7 @@ function dejarCaer(
   for (let i = 0; i < cuerpo.length; i += 3) {
     const x = cuerpo[i]!;
     const y = cuerpo[i + 1]!;
-    if (y > pecho || Math.abs(x) > semiancho * 1.3) continue;
+    if (y > pecho || brazos[i / 3]) continue;
     const f = Math.floor(y / FRANJA);
     let fila = franjas.get(f);
     if (!fila) franjas.set(f, (fila = new Float32Array(sectores)));
@@ -606,7 +734,7 @@ function dejarCaer(
   // La tela puede tener dos capas (el dobladillo vuelto hacia adentro): en cada franja de altura y
   // dirección todos sus puntos se mueven lo mismo, así las capas no se cruzan. La capa de afuera
   // no pasa de la caída; la de adentro se apoya sobre lo que sobresale bajo el pecho (glúteos,
-  // cadera, abdomen) hasta unos centímetros más allá de la caída, donde ya están los brazos.
+  // cadera, abdomen).
   const limiteEn = (s: number) => {
     let limite = 0;
     for (const ds of [-1, 0, 1]) limite = Math.max(limite, colgado[(s + ds + sectores) % sectores]!);

@@ -342,9 +342,22 @@ export function medidasDeTalla(tipo: TipoPrenda, talla: string): MedidasTalla | 
   return tablaDeTallas(tipo).find((medidas) => normalizar(medidas.talla) === buscada) ?? null;
 }
 
-/** El contorno del cuerpo con que se elige la talla: pecho arriba, cintura abajo. */
+/** Parte del cuerpo con que se elige la talla. */
+export type ZonaDeReferencia = 'pecho' | 'abdomen' | 'cintura';
+
+/**
+ * Dónde se mide el cuerpo para elegir la talla: la cintura en pantalones y cinturones; arriba, el
+ * pecho, salvo que el abdomen sea mayor (con más peso la cintura crece más rápido que el pecho):
+ * entonces la polera tiene que rodear el abdomen.
+ */
+export function zonaDeReferencia(cuerpo: MedidasCuerpo, tipo: TipoPrenda): ZonaDeReferencia {
+  if (tipo === 'pantalon' || tipo === 'cinturon') return 'cintura';
+  return cuerpo.cintura > cuerpo.pecho ? 'abdomen' : 'pecho';
+}
+
+/** El contorno del cuerpo con que se elige la talla (ver `zonaDeReferencia`). */
 export function contornoDeReferencia(cuerpo: MedidasCuerpo, tipo: TipoPrenda): number {
-  return tipo === 'pantalon' || tipo === 'cinturon' ? cuerpo.cintura : cuerpo.pecho;
+  return zonaDeReferencia(cuerpo, tipo) === 'pecho' ? cuerpo.pecho : cuerpo.cintura;
 }
 
 /** Largo que le queda bien a ese cuerpo: del hombro a la cadera arriba, de la entrepierna al tobillo abajo. */
@@ -406,6 +419,32 @@ export function recomendarTalla(cuerpo: MedidasCuerpo, tipo: TipoPrenda): string
 
 export function mismaTalla(a: string, b: string): boolean {
   return normalizar(a) === normalizar(b);
+}
+
+/**
+ * Qué hacer cuando la talla puesta no le queda bien a ese cuerpo: `subir` si queda apretada y
+ * `bajar` si queda holgada, a la talla más cercana que ya no queda así. Si ninguna calza, la
+ * del extremo (la más grande o la más chica), con `calza` en falso; `talla` es `null` si la puesta
+ * ya es la del extremo. Si la talla queda justa, no hay consejo.
+ */
+export interface ConsejoTalla {
+  cambio: 'subir' | 'bajar';
+  talla: string | null;
+  calza: boolean;
+}
+
+export function aconsejarTalla(cuerpo: MedidasCuerpo, tipo: TipoPrenda, talla: string): ConsejoTalla | null {
+  const ajuste = evaluarAjuste(cuerpo, tipo, talla);
+  if (!ajuste || ajuste.ancho === 'justa') return null;
+  const tabla = tablaDeTallas(tipo);
+  const actual = tabla.findIndex((medidas) => mismaTalla(medidas.talla, talla));
+  const cambio = ajuste.ancho === 'apretada' ? 'subir' : 'bajar';
+  const candidatas = cambio === 'subir' ? tabla.slice(actual + 1) : tabla.slice(0, actual).reverse();
+  // Al subir basta con que deje de apretar (un pantalón que calza de cadera puede sobrar de
+  // cintura); al bajar, con que deje de sobrar.
+  const calza = candidatas.find((medidas) => evaluarAjuste(cuerpo, tipo, medidas.talla)?.ancho !== ajuste.ancho);
+  if (calza) return { cambio, talla: calza.talla, calza: true };
+  return { cambio, talla: candidatas[candidatas.length - 1]?.talla ?? null, calza: false };
 }
 
 const COLORES: [nombre: string, hex: string][] = [

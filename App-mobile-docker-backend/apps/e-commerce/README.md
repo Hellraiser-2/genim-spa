@@ -15,7 +15,7 @@ Tienda online de ropa Rock & Metal, conectada al backend de Rockstar (`services/
 - Perfil: el botón con el nombre, en el encabezado, abre los datos de la cuenta y sus compras. Las pendientes son las que aún esperan pago y se pueden retomar; las hechas son las pagadas, con el estado de su pedido.
 - Acceso del personal con sus cuentas del backend. Bodega ingresa stock y registra mermas; el Gerente define precio y descripción y ve las cifras.
 - Chat de soporte Roxy, con respuestas locales.
-- Probador 3D: el botón **Probar** de cada prenda abre un maniquí 3D con la altura y el peso del cliente, vestido con la talla elegida. Indica si queda apretada, bien u holgada y corta o larga, recomienda una talla y la agrega al carrito. Las medidas se recuerdan en el navegador y no se envían al backend.
+- Probador 3D: el botón **Probar** de cada prenda abre un maniquí 3D con la altura y el peso del cliente, vestido con la talla elegida. Indica si queda apretada, bien u holgada y corta o larga, recomienda una talla y la agrega al carrito. Se abre con la talla recomendada y esa talla no cambia sola: si el cliente sube el peso, la prenda le queda chica (una polera se sube y deja ver el abdomen) y el probador le aconseja subir de talla, con un botón para probarla. Las medidas se recuerdan en el navegador y no se envían al backend.
 
 El pago es **simulado**: no se pide tarjeta ni se cobra. La pantalla de pago deja elegir si se aprueba o se rechaza.
 
