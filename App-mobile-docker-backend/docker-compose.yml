@@ -47,6 +47,13 @@ services:
       CORS_ORIGENES: ${CORS_ORIGENES:-}
       # Clave del servicio de IA que usa el asesor de inversión del Gerente. Sin ella, el resto funciona igual.
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # Punto de partida de la ruta de reparto de la app de bodega. Sin ellas, una ubicación de ejemplo en Santiago.
+      BODEGA_NOMBRE: ${BODEGA_NOMBRE:-}
+      BODEGA_DIRECCION: ${BODEGA_DIRECCION:-}
+      BODEGA_LAT: ${BODEGA_LAT:-}
+      BODEGA_LON: ${BODEGA_LON:-}
+      # Correo con que la API se identifica ante los servicios de mapas de OpenStreetMap.
+      MAPAS_CONTACTO: ${MAPAS_CONTACTO:-}
     volumes:
       - api-claves:/claves
     ports:

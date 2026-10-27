@@ -5,6 +5,7 @@ import type {
   BusquedaRequest,
   Categoria,
   CierreBusquedaRequest,
+  Coordenada,
   ErrorApi,
   IngresoRequest,
   LineaPedido,
@@ -16,6 +17,7 @@ import type {
   ProductoNuevoRequest,
   RefreshRequest,
   ResultadoMovimientos,
+  RutaReparto,
   SesionResponse,
   TipoMerma,
   TraspasoRequest,
@@ -171,6 +173,27 @@ function variantesIniciales(ubicaciones: AsignadorDeUbicaciones): VarianteSimula
     fila(7, 'Polera Eddie', 'Iron Maiden', 'M', 'Negro', 9, 2),
     fila(8, 'Polera Rayo', 'AC/DC', 'L', 'Negro', 5, 1),
   ];
+}
+
+/** Bodega y centros de comuna de la ruta de reparto simulada. */
+const BODEGA_SIMULADA = { nombre: 'Bodega (ubicación de ejemplo)', direccion: 'Plaza de Armas, Santiago', ubicacion: { lat: -33.4378, lon: -70.6504 } };
+const COMUNAS_SIMULADAS: Record<string, Coordenada> = {
+  Santiago: { lat: -33.4489, lon: -70.6693 },
+  Providencia: { lat: -33.4263, lon: -70.6178 },
+  'Ñuñoa': { lat: -33.4569, lon: -70.5977 },
+  'Las Condes': { lat: -33.4083, lon: -70.5671 },
+  Vitacura: { lat: -33.3906, lon: -70.5747 },
+  'La Florida': { lat: -33.5225, lon: -70.5986 },
+  'Maipú': { lat: -33.5167, lon: -70.7667 },
+  'Puente Alto': { lat: -33.6117, lon: -70.5758 },
+};
+/** 25 km/h en metros por segundo: la velocidad media en la ciudad. */
+const VELOCIDAD_SIMULADA = 25_000 / 3600;
+
+function distanciaRecta(a: Coordenada, b: Coordenada): number {
+  const rad = (grados: number) => (grados * Math.PI) / 180;
+  const h = Math.sin(rad(b.lat - a.lat) / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(rad(b.lon - a.lon) / 2) ** 2;
+  return 2 * 6_371_000 * Math.asin(Math.sqrt(h));
 }
 
 /** Pedidos de ejemplo con fechas relativas al momento actual, para que siempre haya de cada estado. */
@@ -375,6 +398,8 @@ export class BackendSimulado {
         return this.iniciarBusqueda(cuerpo as BusquedaRequest);
       case 'GET /logistica/pedidos':
         return this.listarPedidos(url.searchParams.get('estado'));
+      case 'GET /logistica/rutas/reparto':
+        return this.rutaDeReparto();
     }
     throw new ErrorSimulado(404, 'NO_ENCONTRADO', `Ruta no simulada: ${ruta}`);
   }
@@ -774,6 +799,54 @@ export class BackendSimulado {
   }
 
   // --- Logística ---
+
+  /**
+   * Ruta de reparto sin servicios de mapas: cada comuna tiene una coordenada fija, el orden
+   * es el del vecino más cercano y las distancias son en línea recta, como el respaldo del backend.
+   */
+  private rutaDeReparto(): RutaReparto {
+    const origen = BODEGA_SIMULADA.ubicacion;
+    const pendientes = this.pedidos.filter(
+      (pedido) => pedido.region === 'Región Metropolitana' && pedido.estado !== 'DESPACHADO' && pedido.estado !== 'ENTREGADO',
+    );
+    const ubicados = pendientes.filter((pedido) => COMUNAS_SIMULADAS[pedido.comuna]);
+    const paradas: RutaReparto['paradas'] = [];
+    let actual = origen;
+    const porVisitar = [...ubicados];
+    while (porVisitar.length > 0) {
+      porVisitar.sort((a, b) => distanciaRecta(actual, COMUNAS_SIMULADAS[a.comuna]!) - distanciaRecta(actual, COMUNAS_SIMULADAS[b.comuna]!));
+      const pedido = porVisitar.shift()!;
+      const ubicacion = COMUNAS_SIMULADAS[pedido.comuna]!;
+      const distancia = Math.round(distanciaRecta(actual, ubicacion));
+      paradas.push({
+        orden: paradas.length + 1,
+        idPedido: pedido.idPedido,
+        estado: pedido.estado,
+        destinatario: pedido.destinatario,
+        direccion: pedido.direccion,
+        comuna: pedido.comuna,
+        unidades: pedido.lineas.reduce((suma, linea) => suma + linea.cantidad, 0),
+        ubicacion,
+        precision: 'COMUNA',
+        distanciaTramo: distancia,
+        duracionTramo: Math.round(distancia / VELOCIDAD_SIMULADA),
+      });
+      actual = ubicacion;
+    }
+    const regreso = Math.round(distanciaRecta(actual, origen));
+    const distanciaTotal = paradas.reduce((suma, parada) => suma + parada.distanciaTramo, 0) + (paradas.length > 0 ? regreso : 0);
+    return {
+      origen: BODEGA_SIMULADA,
+      paradas,
+      sinUbicar: pendientes
+        .filter((pedido) => !COMUNAS_SIMULADAS[pedido.comuna])
+        .map(({ idPedido, destinatario, direccion, comuna }) => ({ idPedido, destinatario, direccion, comuna })),
+      trazado: paradas.length > 0 ? [origen, ...paradas.map((parada) => parada.ubicacion), origen] : [],
+      distanciaTotal,
+      duracionTotal: Math.round(distanciaTotal / VELOCIDAD_SIMULADA),
+      calculo: 'LINEA_RECTA',
+    };
+  }
 
   private listarPedidos(estado: string | null): Pedido[] {
     return this.pedidos.filter((pedido) => !estado || pedido.estado === estado).map((pedido) => ({ ...pedido }));

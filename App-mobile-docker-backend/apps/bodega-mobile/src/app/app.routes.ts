@@ -44,6 +44,10 @@ export const routes: Routes = [
         path: 'envios',
         loadComponent: () => import('./features/envios/envios.page').then((m) => m.EnviosPage),
       },
+      {
+        path: 'envios/ruta',
+        loadComponent: () => import('./features/envios/ruta.page').then((m) => m.RutaRepartoPage),
+      },
       // Etiquetas y edición no están en el menú: se abren desde la ficha de una prenda.
       {
         path: 'etiquetas',

@@ -200,6 +200,16 @@ Requisitos para compilar, una sola vez por equipo:
 
 El APK es de depuración: sirve para instalarlo directamente, no para publicarlo en una tienda. La app habla con el backend por HTTP sin cifrar, lo que es aceptable dentro de la red de la tienda y no fuera de ella.
 
+## Ruta de reparto
+
+En la app de bodega, **Envíos → Ruta** muestra en un mapa el recorrido para repartir en el día los pedidos por enviar de la Región Metropolitana; los de regiones siguen por Starken. La ruta sale de la bodega, pasa por cada dirección en el orden que menos maneja y vuelve, con la distancia y el tiempo de cada tramo y un botón para navegar hasta cada parada en Google Maps (`GET /api/v1/logistica/rutas/reparto`).
+
+- Las direcciones se ubican con Nominatim y el recorrido lo calcula OSRM, ambos de OpenStreetMap: gratuitos y sin clave. Cada dirección se busca una sola vez y queda guardada (tabla `logistica.geocodificaciones`).
+- Si no se encuentra la calle, la parada queda en el centro de su comuna y la pantalla lo avisa; si tampoco aparece la comuna, el pedido se lista aparte como "sin ubicar".
+- Si OSRM no responde, el orden es por cercanía y las distancias son en línea recta.
+- La bodega de ejemplo está en la Plaza de Armas de Santiago: la real se configura con `BODEGA_NOMBRE`, `BODEGA_DIRECCION`, `BODEGA_LAT` y `BODEGA_LON` en `.env`.
+- Los servidores públicos de OpenStreetMap tienen límites de uso (una búsqueda por segundo) pensados para pruebas y volúmenes bajos. Para operar a diario conviene un servidor propio o contratado, en `GEOCODIFICADOR_URL` y `RUTAS_URL`.
+
 ## Pruebas
 
 ```
@@ -233,5 +243,10 @@ npm run test:e2e
 | `MIGRACIONES_DIR` | Carpeta de migraciones | `db/migrations` |
 | `ANTHROPIC_API_KEY` | Clave del servicio de IA del chat del asesor. Sin ella, el chat no se muestra | vacío |
 | `DEEZER_API_URL` | API de donde el asesor toma la popularidad de las bandas | `https://api.deezer.com` |
+| `BODEGA_NOMBRE`, `BODEGA_DIRECCION` | Nombre y dirección de la bodega, desde donde sale la ruta de reparto | Ejemplo en la Plaza de Armas |
+| `BODEGA_LAT`, `BODEGA_LON` | Coordenadas de la bodega, en grados decimales | `-33.4378`, `-70.6504` |
+| `GEOCODIFICADOR_URL` | Servicio que ubica direcciones (Nominatim) | `https://nominatim.openstreetmap.org` |
+| `RUTAS_URL` | Servicio que calcula recorridos por calles (OSRM) | `https://router.project-osrm.org` |
+| `MAPAS_CONTACTO` | Correo con que la API se identifica ante esos servicios | vacío |
 
 Las cuentas de demostración tienen contraseñas públicas. Fuera de desarrollo, usa `SEMBRAR_DEMO=false`.

@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   IonBackButton,
   IonBadge,
@@ -12,11 +13,12 @@ import {
   IonSegmentButton,
   IonText,
   IonTitle,
+  IonRouterLink,
   IonToolbar,
 } from '@ionic/angular';
 import type { Pedido } from '@rockstar/contracts';
 import { addIcons } from 'ionicons';
-import { cubeOutline, locationOutline, timeOutline } from 'ionicons/icons';
+import { cubeOutline, locationOutline, mapOutline, timeOutline } from 'ionicons/icons';
 import { firstValueFrom } from 'rxjs';
 
 import { codigoDeError, mensajeDeError } from '../../core/api/errores';
@@ -51,8 +53,10 @@ import { LogisticaApi } from './logistica.api';
     IonSegment,
     IonSegmentButton,
     IonText,
+    IonRouterLink,
     IonTitle,
     IonToolbar,
+    RouterLink,
   ],
   template: `
     <ion-header>
@@ -61,6 +65,12 @@ import { LogisticaApi } from './logistica.api';
           <ion-back-button defaultHref="/inicio"></ion-back-button>
         </ion-buttons>
         <ion-title>Envíos</ion-title>
+        <ion-buttons slot="end">
+          <ion-button routerLink="/envios/ruta" aria-label="Ruta de reparto en el mapa">
+            <ion-icon slot="start" name="map-outline" aria-hidden="true"></ion-icon>
+            Ruta
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
       <ion-toolbar>
         <ion-segment [value]="grupo()" (ionChange)="grupo.set($any(valor($event)))">
@@ -278,7 +288,7 @@ export class EnviosPage {
   };
 
   constructor() {
-    addIcons({ cubeOutline, locationOutline, timeOutline });
+    addIcons({ cubeOutline, locationOutline, mapOutline, timeOutline });
   }
 
   /** Ionic lo llama cada vez que se entra a la pantalla, de modo que los envíos estén al día. */

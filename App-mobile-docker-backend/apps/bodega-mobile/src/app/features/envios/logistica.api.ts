@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import type { Pedido } from '@rockstar/contracts';
+import type { Pedido, RutaReparto } from '@rockstar/contracts';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
@@ -13,6 +13,11 @@ export class LogisticaApi {
 
   pedidos(): Observable<Pedido[]> {
     return this.http.get<Pedido[]>(`${this.url}/pedidos`);
+  }
+
+  /** Ruta de reparto de los pedidos por enviar de la Región Metropolitana, desde la bodega. */
+  rutaDeReparto(): Observable<RutaReparto> {
+    return this.http.get<RutaReparto>(`${this.url}/rutas/reparto`);
   }
 
   /**

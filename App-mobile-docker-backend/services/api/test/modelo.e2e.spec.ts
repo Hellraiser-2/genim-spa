@@ -49,6 +49,7 @@ const TABLAS_DEL_DISENO: Record<string, string[]> = {
     'comunas',
     'despachos_pendientes',
     'estados_pedido',
+    'geocodificaciones',
     'historial_pedido',
     'pedidos',
     'regiones',

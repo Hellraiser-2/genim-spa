@@ -467,6 +467,13 @@ erDiagram
     integer tramo_peso PK
     integer valor
   }
+  geocodificaciones {
+    text consulta PK
+    double lat
+    double lon
+    text precision
+    timestamptz buscada_en
+  }
   regiones ||--o{ comunas : "id_region"
   pedidos ||--o| despachos_pendientes : "id_pedido"
   estados_pedido ||--o{ historial_pedido : "id_estado"

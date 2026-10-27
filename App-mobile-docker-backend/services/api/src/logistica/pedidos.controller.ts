@@ -1,16 +1,18 @@
 import { Controller, Get, HttpCode, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
-import type { Pedido, PedidoCliente, Usuario } from '@rockstar/contracts';
+import type { Pedido, PedidoCliente, RutaReparto, Usuario } from '@rockstar/contracts';
 
 import { Roles, UsuarioActual } from '../auth/decoradores.js';
 import { BaseDeDatos } from '../db/base-de-datos.js';
 import { pedidosConLineas, pedidosDeCliente } from './consultas.js';
 import { DespachosService } from './despachos.service.js';
+import { RutasService } from './rutas.service.js';
 
 @Controller('logistica')
 export class PedidosController {
   constructor(
     private readonly db: BaseDeDatos,
     private readonly despachos: DespachosService,
+    private readonly rutas: RutasService,
   ) {}
 
   /** Pedidos del e-commerce tal como los ve el personal, con sus líneas. `estado` limita la lista a uno. */
@@ -20,6 +22,16 @@ export class PedidosController {
     return pedidosConLineas(this.db, 'WHERE $1::text IS NULL OR es.codigo = $1', [
       typeof estado === 'string' && estado !== '' ? estado : null,
     ]);
+  }
+
+  /**
+   * Ruta para repartir desde la bodega los pedidos por enviar de la Región Metropolitana:
+   * el orden de las paradas, el recorrido por calles y lo que tarda.
+   */
+  @Get('rutas/reparto')
+  @Roles('VENDEDOR', 'BODEGA', 'GERENTE')
+  rutaDeReparto(): Promise<RutaReparto> {
+    return this.rutas.reparto();
   }
 
   /** Los pedidos de quien consulta, con su estado y, si ya se despacharon, el código de seguimiento. */

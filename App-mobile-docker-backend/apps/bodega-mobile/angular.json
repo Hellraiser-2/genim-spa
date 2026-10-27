@@ -39,7 +39,8 @@
             "define": {
               "SERVIDOR_API": "''",
               "MODO_DEMO": "false"
-            }
+            },
+            "allowedCommonJsDependencies": ["leaflet"]
           },
           "configurations": {
             "production": {
