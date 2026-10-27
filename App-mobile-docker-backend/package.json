@@ -1,0 +1,11 @@
+{
+  "name": "rockstar-omnicanal",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Plataforma omnicanal: bodega, POS y e-commerce sobre un inventario único",
+  "workspaces": [
+    "apps/bodega-mobile",
+    "services/*",
+    "packages/*"
+  ]
+}

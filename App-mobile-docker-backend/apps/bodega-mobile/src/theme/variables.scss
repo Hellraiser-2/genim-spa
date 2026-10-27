@@ -1,0 +1,113 @@
+// Identidad visual de Rockstar Bodega: escenario oscuro con un acento ámbar.
+// Este archivo se carga después de global.scss, de modo que sus valores reemplazan
+// los de la paleta oscura de Ionic.
+
+// Solo el subconjunto latino: cubre el español y evita empaquetar el resto.
+@font-face {
+  font-family: 'Oswald Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 700;
+  src: url('@fontsource-variable/oswald/files/oswald-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+// La paleta oscura de Ionic define sus valores en `:root.md` y `:root.ios`; la
+// repetición de `:root` da a estos la precedencia sin depender del orden de carga.
+:root:root:root {
+  // Superficies y texto propios de la app.
+  --rs-fondo: #0b0b0e;
+  --rs-superficie: #16161b;
+  --rs-superficie-alta: #202027;
+  --rs-borde: rgba(255, 255, 255, 0.08);
+  --rs-borde-fuerte: rgba(255, 255, 255, 0.16);
+  --rs-texto: #f5f3ee;
+  --rs-tenue: #a09ea8;
+  --rs-radio: 18px;
+  --rs-radio-chico: 14px;
+  --rs-fuente-titulo: 'Oswald Variable', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+
+  --ion-font-family: 'Inter Variable', Roboto, 'Helvetica Neue', sans-serif;
+
+  --ion-background-color: #0b0b0e;
+  --ion-background-color-rgb: 11, 11, 14;
+  --ion-text-color: #f5f3ee;
+  --ion-text-color-rgb: 245, 243, 238;
+  --ion-item-background: transparent;
+  --ion-toolbar-background: #0b0b0e;
+  --ion-card-background: #16161b;
+  --ion-border-color: rgba(255, 255, 255, 0.08);
+  --ion-item-border-color: rgba(255, 255, 255, 0.08);
+  --ion-placeholder-color: #a09ea8;
+
+  // Ámbar de foco de escenario: el color de marca y de la acción principal.
+  --ion-color-primary: #ffc22e;
+  --ion-color-primary-rgb: 255, 194, 46;
+  --ion-color-primary-contrast: #15120a;
+  --ion-color-primary-contrast-rgb: 21, 18, 10;
+  --ion-color-primary-shade: #e0ab28;
+  --ion-color-primary-tint: #ffc843;
+
+  --ion-color-secondary: #8b7bff;
+  --ion-color-secondary-rgb: 139, 123, 255;
+  --ion-color-secondary-contrast: #0b0b0e;
+  --ion-color-secondary-contrast-rgb: 11, 11, 14;
+  --ion-color-secondary-shade: #7a6ce0;
+  --ion-color-secondary-tint: #9788ff;
+
+  --ion-color-tertiary: #4cc9f0;
+  --ion-color-tertiary-rgb: 76, 201, 240;
+  --ion-color-tertiary-contrast: #0b0b0e;
+  --ion-color-tertiary-contrast-rgb: 11, 11, 14;
+  --ion-color-tertiary-shade: #43b1d3;
+  --ion-color-tertiary-tint: #5ecef2;
+
+  --ion-color-success: #3ddc97;
+  --ion-color-success-rgb: 61, 220, 151;
+  --ion-color-success-contrast: #06140d;
+  --ion-color-success-contrast-rgb: 6, 20, 13;
+  --ion-color-success-shade: #36c285;
+  --ion-color-success-tint: #50e0a1;
+
+  --ion-color-warning: #ff9f43;
+  --ion-color-warning-rgb: 255, 159, 67;
+  --ion-color-warning-contrast: #1a0f04;
+  --ion-color-warning-contrast-rgb: 26, 15, 4;
+  --ion-color-warning-shade: #e08c3b;
+  --ion-color-warning-tint: #ffa956;
+
+  --ion-color-danger: #ff5c5c;
+  --ion-color-danger-rgb: 255, 92, 92;
+  --ion-color-danger-contrast: #1a0606;
+  --ion-color-danger-contrast-rgb: 26, 6, 6;
+  --ion-color-danger-shade: #e05151;
+  --ion-color-danger-tint: #ff6c6c;
+
+  --ion-color-medium: #a09ea8;
+  --ion-color-medium-rgb: 160, 158, 168;
+  --ion-color-medium-contrast: #0b0b0e;
+  --ion-color-medium-contrast-rgb: 11, 11, 14;
+  --ion-color-medium-shade: #8d8b94;
+  --ion-color-medium-tint: #aaa8b1;
+
+  --ion-color-light: #2a2a32;
+  --ion-color-light-rgb: 42, 42, 50;
+  --ion-color-light-contrast: #f5f3ee;
+  --ion-color-light-contrast-rgb: 245, 243, 238;
+  --ion-color-light-shade: #25252c;
+  --ion-color-light-tint: #3f3f47;
+
+  --ion-color-dark: #f5f3ee;
+  --ion-color-dark-rgb: 245, 243, 238;
+  --ion-color-dark-contrast: #0b0b0e;
+  --ion-color-dark-contrast-rgb: 11, 11, 14;
+  --ion-color-dark-shade: #d8d6d1;
+  --ion-color-dark-tint: #f6f4f0;
+}

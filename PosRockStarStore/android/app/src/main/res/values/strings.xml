@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rockstar POS</string>
+    <string name="title_activity_main">Rockstar POS</string>
+    <string name="package_name">com.rockstar.pos</string>
+    <string name="custom_url_scheme">com.rockstar.pos</string>
+</resources>

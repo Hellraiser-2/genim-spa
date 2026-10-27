@@ -1,0 +1,41 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend de Rockstar en NestJS: usuarios, inventario y logística sobre PostgreSQL",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/services/api/src/main.js",
+    "local": "npm run build && node test/entorno-local.mjs",
+    "semilla:bandas": "node scripts/cargar-bandas.mjs",
+    "semilla:prendas": "node scripts/cargar-prendas.mjs",
+    "semilla:historial": "node scripts/sembrar-historial.mjs",
+    "semilla:historial:quitar": "node scripts/sembrar-historial.mjs --quitar",
+    "ventas:ejemplo": "node scripts/generar-ventas-ejemplo.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --config vitest.config.mts",
+    "test:e2e": "npm run build && vitest run --config vitest.e2e.config.mts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
+    "@nestjs/common": "^12.1.2",
+    "@nestjs/core": "^12.1.2",
+    "@nestjs/platform-express": "^12.1.2",
+    "@node-rs/argon2": "^2.2.1",
+    "@rockstar/contracts": "*",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@electric-sql/pglite-socket": "^0.2.11",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.3",
+    "@types/pg": "^8.23.1",
+    "typescript": "~6.0.3",
+    "vitest": "^4.0.18"
+  }
+}

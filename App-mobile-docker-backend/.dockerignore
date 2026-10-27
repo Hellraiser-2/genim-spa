@@ -1,0 +1,16 @@
+# Lo que no debe entrar al contexto de construcción de las imágenes.
+.git
+.claude
+openspec
+
+**/node_modules
+**/dist
+**/www
+**/.angular
+**/coverage
+**/claves
+**/*.log
+.env
+
+# Proyecto nativo de Android: no participa de la imagen web.
+apps/bodega-mobile/android

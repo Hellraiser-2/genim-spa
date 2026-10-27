@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ámbar de la marca, el mismo del sello de la pantalla de inicio de sesión. -->
+    <color name="ic_launcher_background">#FFC22E</color>
+</resources>

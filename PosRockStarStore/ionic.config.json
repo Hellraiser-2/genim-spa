@@ -1,0 +1,7 @@
+{
+  "name": "PosRockStarStore",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

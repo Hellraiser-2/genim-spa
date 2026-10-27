@@ -1,0 +1,87 @@
+# Rockstar en cuatro contenedores, uno por pieza:
+#
+#   db      PostgreSQL
+#   api     backend en NestJS
+#   app     app de bodega, servida por nginx
+#   tienda  e-commerce, servido por nginx
+#
+#   docker compose up --build        levanta todo; la app de bodega queda en
+#                                    http://localhost:8080 y la tienda en http://localhost:8081
+#   docker compose down              detiene y conserva los datos
+#   docker compose down --volumes    detiene y borra la base y las claves
+#
+# Los valores por defecto son para desarrollo. Para cambiarlos, copia `.env.example` a `.env`.
+
+name: rockstar
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: rockstar
+      POSTGRES_USER: rockstar
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rockstar_dev}
+    volumes:
+      - db-datos:/var/lib/postgresql/data
+    ports:
+      # Solo desde este equipo, para inspeccionar la base con un cliente SQL.
+      - "127.0.0.1:${DB_PUERTO:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username=rockstar --dbname=rockstar"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    restart: unless-stopped
+    init: true
+    environment:
+      DATABASE_URL: postgres://rockstar:${POSTGRES_PASSWORD:-rockstar_dev}@db:5432/rockstar
+      # Cuentas, productos y pedidos de demostración si la base está vacía.
+      SEMBRAR_DEMO: ${SEMBRAR_DEMO:-true}
+      # Orígenes que pueden llamar a la API desde un navegador, separados por coma. Vacío acepta cualquiera.
+      CORS_ORIGENES: ${CORS_ORIGENES:-}
+      # Clave del servicio de IA que usa el asesor de inversión del Gerente. Sin ella, el resto funciona igual.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    volumes:
+      - api-claves:/claves
+    ports:
+      # Publicado para la app instalada en un teléfono, que llama a la API por la IP de este equipo.
+      - "${API_PUERTO:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      dockerfile: apps/bodega-mobile/Dockerfile
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:3000
+    ports:
+      - "${APP_PUERTO:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  tienda:
+    build:
+      context: .
+      dockerfile: apps/e-commerce/Dockerfile
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:3000
+    ports:
+      - "${TIENDA_PUERTO:-8081}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  db-datos:
+  api-claves:

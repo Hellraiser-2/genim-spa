@@ -1,0 +1,4 @@
+# Recursos de MakeHuman (CC0) que se descargan aparte: ver README.md.
+recursos/
+# Archivos de Python compilados.
+__pycache__/

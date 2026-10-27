@@ -1,0 +1,8 @@
+{
+  "name": "@rockstar/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tipos de los contratos de API compartidos entre servicios y clientes",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}

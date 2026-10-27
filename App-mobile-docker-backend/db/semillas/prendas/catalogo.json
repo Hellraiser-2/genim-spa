@@ -1,0 +1,148 @@
+{
+  "productos": [
+    {
+      "nombre": "Chaqueta de Cuero Biker",
+      "categoria": "Chaquetas",
+      "estilo": "cuero",
+      "color": "Negro",
+      "tallas": { "S": 3, "M": 5, "L": 5, "XL": 3 },
+      "precio": 94990,
+      "descripcion": "Chaqueta de cuero negra con cierre cruzado, solapas con broches y bolsillos con cierre. El clásico del rock desde los años 50."
+    },
+    {
+      "nombre": "Chaqueta de Cuero Café Vintage",
+      "categoria": "Chaquetas",
+      "estilo": "cuero",
+      "color": "Café",
+      "tallas": { "M": 3, "L": 4, "XL": 2 },
+      "precio": 99990,
+      "descripcion": "Chaqueta de cuero café con terminación envejecida, cuello camisero y cierre al centro."
+    },
+    {
+      "nombre": "Chaqueta de Cuero Sintético Burdeo",
+      "categoria": "Chaquetas",
+      "estilo": "cuero",
+      "color": "Burdeo",
+      "tallas": { "XS": 2, "S": 4, "M": 4, "L": 3 },
+      "precio": 64990,
+      "descripcion": "Chaqueta biker de cuero sintético color burdeo, liviana y con forro interior."
+    },
+    {
+      "nombre": "Chaqueta de Mezclilla Clásica",
+      "categoria": "Chaquetas",
+      "estilo": "mezclilla",
+      "color": "Azul",
+      "tallas": { "S": 4, "M": 6, "L": 6, "XL": 4 },
+      "precio": 44990,
+      "descripcion": "Chaqueta de mezclilla azul con costuras dobles, bolsillos de parche en el pecho y botones metálicos."
+    },
+    {
+      "nombre": "Chaqueta de Mezclilla Negra Oversize",
+      "categoria": "Chaquetas",
+      "estilo": "mezclilla",
+      "color": "Negro",
+      "tallas": { "M": 5, "L": 5, "XL": 4, "XXL": 2 },
+      "precio": 49990,
+      "descripcion": "Chaqueta de mezclilla negra de corte holgado, ideal para ponerle parches y pins."
+    },
+    {
+      "nombre": "Chaqueta Bomber Negra",
+      "categoria": "Chaquetas",
+      "estilo": "bomber",
+      "color": "Negro",
+      "tallas": { "S": 4, "M": 6, "L": 6, "XL": 3 },
+      "precio": 54990,
+      "descripcion": "Chaqueta bomber negra acolchada, con puños, cuello y cintura de punto elasticado."
+    },
+    {
+      "nombre": "Chaqueta Militar Verde Oliva",
+      "categoria": "Chaquetas",
+      "estilo": "militar",
+      "color": "Verde oliva",
+      "tallas": { "S": 3, "M": 5, "L": 5, "XL": 3 },
+      "precio": 49990,
+      "descripcion": "Chaqueta de estilo militar en gabardina verde oliva, con cuatro bolsillos con tapa."
+    },
+    {
+      "nombre": "Chaqueta Bomber Gris",
+      "categoria": "Chaquetas",
+      "estilo": "bomber",
+      "color": "Gris",
+      "tallas": { "M": 4, "L": 4, "XL": 3 },
+      "precio": 52990,
+      "descripcion": "Chaqueta bomber gris carbón, liviana, con bolsillo con cierre en la manga."
+    },
+    {
+      "nombre": "Jeans Pitillo Negro",
+      "categoria": "Pantalones",
+      "estilo": "jeans",
+      "color": "Negro",
+      "tallas": { "38": 4, "40": 6, "42": 6, "44": 5, "46": 3 },
+      "precio": 27990,
+      "descripcion": "Jeans negro de tiro medio y pierna ajustada, con elasticidad para moverse cómodo."
+    },
+    {
+      "nombre": "Jeans Negro Rasgado",
+      "categoria": "Pantalones",
+      "estilo": "rasgado",
+      "color": "Negro",
+      "tallas": { "38": 3, "40": 5, "42": 5, "44": 4 },
+      "precio": 31990,
+      "descripcion": "Jeans negro pitillo con rasgados en las rodillas y bastas deshilachadas."
+    },
+    {
+      "nombre": "Jeans Azul Desgastado",
+      "categoria": "Pantalones",
+      "estilo": "rasgado",
+      "color": "Azul",
+      "tallas": { "40": 4, "42": 6, "44": 6, "46": 4, "48": 2 },
+      "precio": 29990,
+      "descripcion": "Jeans azul con lavado desgastado y rasgados leves, de pierna recta."
+    },
+    {
+      "nombre": "Jeans Gris Lavado",
+      "categoria": "Pantalones",
+      "estilo": "jeans",
+      "color": "Gris",
+      "tallas": { "38": 3, "40": 4, "42": 5, "44": 4 },
+      "precio": 28990,
+      "descripcion": "Jeans gris con lavado a la piedra, pierna ajustada y cinco bolsillos."
+    },
+    {
+      "nombre": "Pantalón Cargo Negro",
+      "categoria": "Pantalones",
+      "estilo": "cargo",
+      "color": "Negro",
+      "tallas": { "40": 4, "42": 5, "44": 5, "46": 4, "48": 2 },
+      "precio": 32990,
+      "descripcion": "Pantalón cargo negro de gabardina, con bolsillos laterales con tapa y bastas ajustables."
+    },
+    {
+      "nombre": "Pantalón Cargo Verde Oliva",
+      "categoria": "Pantalones",
+      "estilo": "cargo",
+      "color": "Verde oliva",
+      "tallas": { "40": 3, "42": 4, "44": 4, "46": 3 },
+      "precio": 32990,
+      "descripcion": "Pantalón cargo verde oliva de corte holgado, con seis bolsillos."
+    },
+    {
+      "nombre": "Pantalón Escocés Punk",
+      "categoria": "Pantalones",
+      "estilo": "escoces",
+      "color": "Rojo",
+      "tallas": { "38": 2, "40": 4, "42": 4, "44": 3 },
+      "precio": 36990,
+      "descripcion": "Pantalón pitillo de cuadros escoceses rojos y negros, el clásico del punk inglés."
+    },
+    {
+      "nombre": "Pantalón de Cuero Sintético",
+      "categoria": "Pantalones",
+      "estilo": "cuero",
+      "color": "Negro",
+      "tallas": { "38": 2, "40": 3, "42": 4, "44": 3 },
+      "precio": 44990,
+      "descripcion": "Pantalón ajustado de cuero sintético negro, con brillo suave y cierre metálico."
+    }
+  ]
+}

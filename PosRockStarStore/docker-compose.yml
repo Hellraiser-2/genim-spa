@@ -1,0 +1,48 @@
+# POS Rockstar Store en Docker.
+#
+#   docker compose up --build    levanta el POS en http://localhost:8082
+#   docker compose down          detiene y conserva todo (no hay volumen propio)
+#
+# Requiere que el proyecto Rockstar este corriendo
+# (App-mobile-docker-backend: db + api + app + tienda).
+# Este compose se une a su red `rockstar_default` para que nginx
+# pueda reenviar /api al servicio `api:3000`.
+
+name: pos-rockstar
+
+services:
+  pos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      # Nombre del servicio api dentro de la red rockstar_default.
+      API_URL: http://api:3000
+    ports:
+      - "${POS_PUERTO:-8082}:80"
+    networks:
+      - rockstar
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --spider http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Maquina de cobro simulada. Publicada en todas las interfaces: el POS la usa por
+  # http://<IP de este equipo>:8090 y su pantalla se abre desde un celular en la misma red.
+  terminal:
+    build:
+      context: terminal-simulada
+    restart: unless-stopped
+    environment:
+      # Milisegundos para aprobar solo cada cobro; 0 = se aprueba desde la pantalla.
+      APROBAR_AUTOMATICO_MS: ${TERMINAL_APROBAR_AUTOMATICO_MS:-0}
+    ports:
+      - "${TERMINAL_PUERTO:-8090}:8090"
+
+networks:
+  rockstar:
+    name: rockstar_default
+    external: true

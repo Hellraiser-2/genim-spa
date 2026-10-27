@@ -1,0 +1,11 @@
+node_modules/
+dist/
+www/
+.angular/
+coverage/
+.env
+*.log
+# Par de claves con que el backend firma los tokens; se genera al arrancar.
+claves/
+# Respaldos de la base de datos: contienen datos reales.
+db/respaldos/

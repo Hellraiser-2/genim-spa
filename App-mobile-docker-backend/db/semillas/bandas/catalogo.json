@@ -1,0 +1,42 @@
+{
+  "bandas": [
+    { "nombre": "AC/DC", "foto": "fotos/ac-dc.jpg", "credito": "Foto: Ed Vill · CC BY 2.0 · Wikimedia Commons" },
+    { "nombre": "Black Sabbath", "foto": "fotos/black-sabbath.jpg", "credito": "Foto: Warner Bros. Records · dominio público · Wikimedia Commons" },
+    { "nombre": "Exodus", "foto": "fotos/exodus.jpg", "credito": "Foto: S. Bollmann · uso con atribución · Wikimedia Commons" },
+    { "nombre": "Guns N' Roses", "foto": "fotos/guns-n-roses.jpg", "credito": "Foto: AxeAdam20 · CC0 · Wikimedia Commons" },
+    { "nombre": "Iron Maiden", "foto": "fotos/iron-maiden.jpg", "credito": "Fotos: adels, Mike Lawrence y otros · CC BY-SA 2.0 · Wikimedia Commons" },
+    { "nombre": "Judas Priest", "foto": "fotos/judas-priest.jpg", "credito": "Foto: Frank Schwichtenberg · CC BY-SA 4.0 · Wikimedia Commons" },
+    { "nombre": "Kiss", "foto": "fotos/kiss.jpg", "credito": "Foto: Casablanca Records · dominio público · Wikimedia Commons" },
+    { "nombre": "Led Zeppelin", "foto": "fotos/led-zeppelin.jpg", "credito": "Foto: Atlantic Records · dominio público · Wikimedia Commons" },
+    { "nombre": "Megadeth", "foto": "fotos/megadeth.jpg", "credito": "Foto: Justice for the Beholder of the Harvester of Blackened Straw · CC BY-SA 4.0 · Wikimedia Commons" },
+    { "nombre": "Metallica", "foto": "fotos/metallica.jpg", "credito": "Foto: Library of Congress Life · CC0 · Wikimedia Commons" },
+    { "nombre": "Misfits", "foto": "fotos/misfits.jpg", "credito": "Foto: IllaZilla · CC BY-SA 3.0 · Wikimedia Commons" },
+    { "nombre": "Motörhead", "foto": "fotos/motorhead.jpg", "credito": "Foto: Mark Marek Photography · CC BY-SA 3.0 · Wikimedia Commons" },
+    { "nombre": "Nirvana", "foto": "fotos/nirvana.jpg", "credito": "Foto: P.B. Rage · CC BY-SA 2.0 · Wikimedia Commons" },
+    { "nombre": "Pantera", "foto": "fotos/pantera.jpg", "credito": "Fotos: April Ashford-Forsythe, Llann Wé² y otros · CC BY-SA 3.0 · Wikimedia Commons" },
+    { "nombre": "Queen", "foto": "fotos/queen.jpg", "credito": "Foto: Koh Hasebe, Elektra Records · dominio público · Wikimedia Commons" },
+    { "nombre": "Ramones", "foto": "fotos/ramones.jpg", "credito": "Foto: Danny Fields · dominio público · Wikimedia Commons" },
+    { "nombre": "Slayer", "foto": "fotos/slayer.jpg", "credito": "Foto: Francis, Groningen · CC BY 2.0 · Wikimedia Commons" }
+  ],
+  "productos": [
+    { "nombre": "Polera Metallica Master of Puppets", "categoria": "Poleras", "banda": "Metallica", "titulo": "Master of Puppets", "color": "Negro", "tallas": { "M": 8, "L": 6 }, "precio": 16990, "descripcion": "Polera negra de algodón con el arte de Master of Puppets, el disco de 1986 de Metallica." },
+    { "nombre": "Polera Iron Maiden The Trooper", "categoria": "Poleras", "banda": "Iron Maiden", "titulo": "The Trooper", "color": "Negro", "tallas": { "M": 7, "L": 7 }, "precio": 16990, "descripcion": "Polera negra de algodón con Eddie en The Trooper, el clásico de Iron Maiden." },
+    { "nombre": "Polera AC/DC Back in Black", "categoria": "Poleras", "banda": "AC/DC", "titulo": "Back in Black", "color": "Negro", "tallas": { "M": 9, "L": 6 }, "precio": 15990, "descripcion": "Polera negra de algodón con el logo de AC/DC y Back in Black, su disco de 1980." },
+    { "nombre": "Polera Nirvana Nevermind", "categoria": "Poleras", "banda": "Nirvana", "titulo": "Nevermind", "color": "Negro", "tallas": { "M": 8, "L": 8 }, "precio": 15990, "descripcion": "Polera negra de algodón de Nevermind, el disco de 1991 de Nirvana." },
+    { "nombre": "Polera Guns N' Roses Appetite for Destruction", "categoria": "Poleras", "banda": "Guns N' Roses", "titulo": "Appetite for Destruction", "color": "Negro", "tallas": { "M": 6, "L": 6 }, "precio": 16990, "descripcion": "Polera negra de algodón con la cruz de Appetite for Destruction, el debut de Guns N' Roses." },
+    { "nombre": "Polera Black Sabbath Paranoid", "categoria": "Poleras", "banda": "Black Sabbath", "titulo": "Paranoid", "color": "Negro", "tallas": { "M": 6, "L": 5 }, "precio": 15990, "descripcion": "Polera negra de algodón de Paranoid, el disco de 1970 de Black Sabbath." },
+    { "nombre": "Polera Slayer Reign in Blood", "categoria": "Poleras", "banda": "Slayer", "titulo": "Reign in Blood", "color": "Negro", "tallas": { "M": 5, "L": 6 }, "precio": 16990, "descripcion": "Polera negra de algodón de Reign in Blood, el disco de 1986 de Slayer." },
+    { "nombre": "Polera Megadeth Rust in Peace", "categoria": "Poleras", "banda": "Megadeth", "titulo": "Rust in Peace", "color": "Negro", "tallas": { "M": 5, "L": 5 }, "precio": 16990, "descripcion": "Polera negra de algodón con Vic Rattlehead en Rust in Peace, de Megadeth." },
+    { "nombre": "Polera Pantera Vulgar Display of Power", "categoria": "Poleras", "banda": "Pantera", "titulo": "Vulgar Display of Power", "color": "Negro", "tallas": { "M": 5, "L": 6 }, "precio": 16990, "descripcion": "Polera negra de algodón de Vulgar Display of Power, el disco de 1992 de Pantera." },
+    { "nombre": "Polera Led Zeppelin IV", "categoria": "Poleras", "banda": "Led Zeppelin", "titulo": "Led Zeppelin IV", "color": "Negro", "tallas": { "M": 6, "L": 4 }, "precio": 15990, "descripcion": "Polera negra de algodón con los cuatro símbolos de Led Zeppelin IV." },
+    { "nombre": "Polera Queen A Night at the Opera", "categoria": "Poleras", "banda": "Queen", "titulo": "A Night at the Opera", "color": "Negro", "tallas": { "M": 6, "L": 5 }, "precio": 15990, "descripcion": "Polera negra de algodón con el escudo de Queen en A Night at the Opera." },
+    { "nombre": "Polera Ramones Rocket to Russia", "categoria": "Poleras", "banda": "Ramones", "titulo": "Rocket to Russia", "color": "Negro", "tallas": { "M": 7, "L": 5 }, "precio": 14990, "descripcion": "Polera negra de algodón con el sello de los Ramones y Rocket to Russia." },
+    { "nombre": "Polera Motörhead Ace of Spades", "categoria": "Poleras", "banda": "Motörhead", "titulo": "Ace of Spades", "color": "Negro", "tallas": { "M": 5, "L": 6 }, "precio": 15990, "descripcion": "Polera negra de algodón de Ace of Spades, el disco de 1980 de Motörhead." },
+    { "nombre": "Polera Kiss Destroyer", "categoria": "Poleras", "banda": "Kiss", "titulo": "Destroyer", "color": "Negro", "tallas": { "M": 5, "L": 5 }, "precio": 15990, "descripcion": "Polera negra de algodón de Destroyer, el disco de 1976 de Kiss." },
+    { "nombre": "Polera Judas Priest British Steel", "categoria": "Poleras", "banda": "Judas Priest", "titulo": "British Steel", "color": "Negro", "tallas": { "M": 4, "L": 5 }, "precio": 15990, "descripcion": "Polera negra de algodón con la hoja de afeitar de British Steel, de Judas Priest." },
+    { "nombre": "Polerón Metallica Ride the Lightning", "categoria": "Polerones", "banda": "Metallica", "titulo": "Ride the Lightning", "color": "Negro", "tallas": { "L": 4, "XL": 3 }, "precio": 36990, "descripcion": "Polerón negro con capucha y el arte de Ride the Lightning, de Metallica." },
+    { "nombre": "Polerón Iron Maiden Powerslave", "categoria": "Polerones", "banda": "Iron Maiden", "titulo": "Powerslave", "color": "Negro", "tallas": { "L": 4, "XL": 3 }, "precio": 36990, "descripcion": "Polerón negro con capucha y el arte de Powerslave, de Iron Maiden." },
+    { "nombre": "Polerón AC/DC Highway to Hell", "categoria": "Polerones", "banda": "AC/DC", "titulo": "Highway to Hell", "color": "Negro", "tallas": { "L": 4, "XL": 4 }, "precio": 34990, "descripcion": "Polerón negro con capucha de Highway to Hell, el disco de 1979 de AC/DC." },
+    { "nombre": "Polerón Nirvana In Utero", "categoria": "Polerones", "banda": "Nirvana", "titulo": "In Utero", "color": "Negro", "tallas": { "L": 3, "XL": 3 }, "precio": 34990, "descripcion": "Polerón negro con capucha de In Utero, el disco de 1993 de Nirvana." }
+  ]
+}

@@ -1,0 +1,542 @@
+/*
+ * Estilos globales de Rockstar Bodega.
+ * Los colores, tipografías y medidas de la marca están en theme/variables.scss;
+ * aquí se aplican a los componentes de Ionic y se definen las piezas compartidas
+ * entre pantallas (grupos, chips, códigos, datos y avisos).
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/* La app es siempre oscura: es parte de la identidad, no una preferencia del sistema. */
+@import "@ionic/angular/css/palettes/dark.always.css";
+
+/* ---------- Base ---------- */
+
+html,
+body {
+  background: var(--rs-fondo);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+ion-content {
+  /*
+   * Un resplandor ámbar tenue en la parte alta, como un foco sobre el escenario. La
+   * primera capa lo desvanece en el borde superior para que empalme con el encabezado.
+   */
+  --background:
+    linear-gradient(to bottom, var(--rs-fondo), transparent 110px),
+    radial-gradient(130% 440px at 50% -60px, rgba(255, 194, 46, 0.13), transparent 70%), var(--rs-fondo);
+}
+
+/* ---------- Encabezado ---------- */
+
+:root ion-header {
+  box-shadow: none;
+}
+
+ion-toolbar {
+  --background: var(--rs-fondo);
+  --border-width: 0;
+  --min-height: 60px;
+}
+
+ion-title {
+  font-family: var(--rs-fuente-titulo);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+ion-back-button {
+  --color: var(--rs-texto);
+}
+
+/* ---------- Grupos, listas y filas ---------- */
+
+:root ion-list,
+.rs-grupo {
+  margin: 12px 16px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--rs-borde);
+  border-radius: var(--rs-radio);
+  background: var(--rs-superficie);
+}
+
+/* Dentro de una tarjeta o de un grupo la lista no dibuja su propio marco. */
+:root ion-card ion-list,
+:root .rs-grupo ion-list {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+ion-item {
+  --background: transparent;
+  --border-width: 0;
+  --inner-border-width: 0 0 1px 0;
+  --border-color: var(--rs-borde);
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  --min-height: 58px;
+}
+
+ion-item[lines='none'],
+ion-list > ion-item:last-child,
+.rs-grupo > ion-item:last-child,
+.rs-grupo > :last-child > ion-item:last-child {
+  --inner-border-width: 0;
+}
+
+ion-item h2,
+ion-item h3 {
+  font-weight: 600;
+}
+
+ion-item p {
+  color: var(--rs-tenue);
+}
+
+ion-note {
+  color: var(--rs-tenue);
+  font-size: 0.85rem;
+}
+
+/* ---------- Tarjetas ---------- */
+
+ion-card {
+  --background: var(--rs-superficie);
+  --color: var(--rs-texto);
+  margin: 12px 16px;
+  border: 1px solid var(--rs-borde);
+  border-radius: var(--rs-radio);
+  box-shadow: none;
+}
+
+/* ---------- Botones ---------- */
+
+ion-button {
+  --border-radius: var(--rs-radio-chico);
+  --box-shadow: none;
+  font-family: var(--rs-fuente-titulo);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+ion-button[expand='block'] {
+  min-height: 54px;
+  margin: 10px 0;
+  font-size: 1.05rem;
+}
+
+ion-button[fill='outline'] {
+  --border-width: 1.5px;
+}
+
+/* Botones de pantalla completa que no viven dentro de un contenedor con relleno. */
+.rs-acciones {
+  padding: 4px 16px;
+}
+
+/* ---------- Selector de dos o tres opciones ---------- */
+
+:root ion-segment {
+  width: auto;
+  margin: 12px 16px;
+  padding: 4px;
+  border: 1px solid var(--rs-borde);
+  border-radius: var(--rs-radio-chico);
+  background: var(--rs-superficie);
+}
+
+ion-segment-button {
+  --background-checked: var(--ion-color-primary);
+  --color: var(--rs-tenue);
+  --color-checked: var(--ion-color-primary-contrast);
+  --indicator-color: transparent;
+  --indicator-height: 0;
+  --border-radius: 10px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  min-height: 42px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ---------- Campos ---------- */
+
+/* `:root` da precedencia sobre las clases con que Ionic define estas variables. */
+:root ion-searchbar {
+  --background: var(--rs-superficie);
+  --border-radius: var(--rs-radio-chico);
+  --box-shadow: 0 0 0 1px var(--rs-borde);
+  --color: var(--rs-texto);
+  --icon-color: var(--rs-tenue);
+  --placeholder-color: var(--rs-tenue);
+  --placeholder-opacity: 1;
+  padding: 8px 16px;
+}
+
+:root ion-input,
+:root ion-textarea,
+ion-select {
+  --highlight-color-focused: var(--ion-color-primary);
+  --placeholder-color: var(--rs-tenue);
+  --placeholder-opacity: 1;
+}
+
+ion-select::part(label),
+ion-input.label-floating .label-text,
+ion-item .label-text {
+  color: var(--rs-tenue);
+}
+
+ion-select::part(text) {
+  font-weight: 600;
+}
+
+ion-select::part(icon) {
+  color: var(--ion-color-primary);
+  opacity: 1;
+}
+
+/* ---------- Etiquetas de estado ---------- */
+
+ion-badge {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+ion-badge.ion-color {
+  background: rgba(var(--ion-color-base-rgb), 0.16);
+  color: var(--ion-color-base);
+}
+
+/* ---------- Listas desplegables y avisos emergentes ---------- */
+
+:root ion-action-sheet {
+  --background: var(--rs-superficie-alta);
+  --button-color: var(--rs-texto);
+  --button-color-selected: var(--ion-color-primary);
+  --button-background-selected: rgba(255, 194, 46, 0.1);
+  --backdrop-opacity: 0.6;
+}
+
+ion-action-sheet .action-sheet-wrapper {
+  overflow: hidden;
+  border: 1px solid var(--rs-borde-fuerte);
+  border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+}
+
+ion-action-sheet .action-sheet-group:first-child {
+  padding-top: 8px;
+}
+
+ion-action-sheet .action-sheet-button {
+  min-height: 54px;
+  font-size: 1rem;
+}
+
+ion-action-sheet .action-sheet-selected {
+  font-weight: 700;
+}
+
+ion-action-sheet .action-sheet-cancel {
+  color: var(--rs-tenue);
+}
+
+ion-toast {
+  --border-radius: var(--rs-radio-chico);
+  font-weight: 600;
+}
+
+/* ---------- Piezas compartidas ---------- */
+
+/* Título de sección: "OPERACIONES", "DESDE", "INGRESA EN". */
+.rs-seccion {
+  margin: 22px 20px 0;
+  color: var(--rs-tenue);
+  font-family: var(--rs-fuente-titulo);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.rs-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--rs-borde-fuerte);
+  border-radius: 999px;
+  color: var(--rs-texto);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.rs-chip--acento {
+  border-color: transparent;
+  background: rgba(255, 194, 46, 0.14);
+  color: var(--ion-color-primary);
+}
+
+/* Código de ubicación, SKU o seguimiento: se lee letra por letra. */
+.rs-codigo {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--rs-superficie-alta);
+  color: var(--rs-texto);
+  font-family: ui-monospace, 'Roboto Mono', Consolas, monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* Cuadrícula de datos numéricos (existencias, códigos generados). */
+.rs-datos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 0;
+}
+
+.rs-datos > div {
+  padding: 12px 14px;
+  border-radius: var(--rs-radio-chico);
+  background: var(--rs-superficie-alta);
+}
+
+.rs-datos dt {
+  color: var(--rs-tenue);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rs-datos dd {
+  margin: 2px 0 0;
+  font-family: var(--rs-fuente-titulo);
+  font-size: 1.7rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.rs-datos .rs-destacado dd {
+  color: var(--ion-color-primary);
+}
+
+/* ---------- Mensajes en pantalla ---------- */
+
+ion-content p[role='status'],
+ion-content p[role='alert'],
+ion-content ul[role='alert'] {
+  margin: 12px 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--rs-borde);
+  border-radius: var(--rs-radio-chico);
+  background: var(--rs-superficie);
+  color: var(--rs-tenue);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+ion-content p[role='alert'],
+ion-content ul[role='alert'] {
+  border-color: rgba(255, 92, 92, 0.32);
+  background: rgba(255, 92, 92, 0.1);
+  color: #ff8f8f;
+}
+
+ion-content ul[role='alert'] {
+  padding-inline-start: 32px;
+}
+
+ion-content ion-text[color='warning'] p[role='status'] {
+  border-color: rgba(255, 159, 67, 0.32);
+  background: rgba(255, 159, 67, 0.1);
+  color: #ffb673;
+}
+
+ion-content p.rs-exito[role='status'] {
+  border-color: rgba(61, 220, 151, 0.32);
+  background: rgba(61, 220, 151, 0.1);
+  color: #7be8b8;
+}
+
+/* Dentro de un contenedor que ya aporta el margen lateral. */
+.ion-padding p[role],
+.ion-padding ul[role],
+.rs-acciones p[role],
+ion-card p[role],
+.rs-grupo p[role] {
+  margin-inline: 0;
+}
+
+.rs-grupo p[role],
+.rs-grupo .rs-ayuda {
+  margin: 12px 16px;
+}
+
+.rs-ayuda {
+  margin: 12px 20px;
+  color: var(--rs-tenue);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+/* ---------- Etiquetas de los espacios de bodega ---------- */
+
+/* Una etiqueta es siempre negro sobre blanco: se imprime y se escanea. */
+.rs-etiqueta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 16px;
+  border-radius: var(--rs-radio);
+  background: #fff;
+  color: #111;
+  text-align: center;
+}
+
+.rs-etiqueta-codigo {
+  margin: 6px 0 0;
+  font-family: var(--rs-fuente-titulo);
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.rs-etiqueta-producto {
+  margin: 0;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.rs-etiqueta-detalle {
+  margin: 0;
+  color: #111;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* La hoja con varias etiquetas y la copia para imprimir no se ven en pantalla. */
+.rs-etiquetas,
+.rs-impresion {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 10mm;
+  }
+
+  /* Ionic fija el documento al alto de la pantalla; al imprimir debe fluir en varias páginas. */
+  html,
+  body {
+    position: static !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  ion-app {
+    display: none !important;
+  }
+
+  .rs-impresion {
+    display: block;
+  }
+
+  .rs-impresion .rs-etiquetas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Borde punteado como guía de corte. */
+  .rs-impresion .rs-etiqueta {
+    padding: 6mm 3mm;
+    border: 1px dashed #999;
+    border-radius: 0;
+    break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .rs-impresion app-codigo-qr {
+    --tamano: 36mm;
+    border-radius: 0;
+  }
+
+  .rs-impresion .rs-etiqueta-codigo {
+    font-size: 20pt;
+  }
+
+  .rs-impresion .rs-etiqueta-producto,
+  .rs-impresion .rs-etiqueta-detalle {
+    font-size: 9pt;
+  }
+
+  /* Una sola etiqueta: más grande, para una repisa. */
+  .rs-impresion > .rs-etiqueta {
+    width: 80mm;
+    margin: 0 auto;
+  }
+
+  .rs-impresion > .rs-etiqueta app-codigo-qr {
+    --tamano: 56mm;
+  }
+
+  .rs-impresion > .rs-etiqueta .rs-etiqueta-codigo {
+    font-size: 30pt;
+  }
+}
