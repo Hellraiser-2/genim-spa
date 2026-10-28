@@ -33,6 +33,8 @@ export interface PrendaEnEscena {
   /** Largo del cuerpo de la prenda, o largo de pierna en pantalones. */
   largo: number;
   color: string;
+  /** Si la tela se sube cuando la talla no rodea el cuerpo (por ahora, la polera que se prueba). */
+  seSube?: boolean;
 }
 
 /** Profundidad del torso respecto de su ancho: la sección del cuerpo es una elipse. */
@@ -562,7 +564,7 @@ export class EscenaManiqui {
       const abajo = p.tipo === 'pantalon';
       // La parte de arriba va por fuera del pantalón: se saca de él además del cuerpo.
       const debajo = abajo ? [] : puestas.filter((x) => x.abajo).map((x) => x.grupo);
-      const resultado = crearPrendaReal(modelo, m, cuerpo, { tipo: p.tipo, contorno: p.contorno, largo: p.largo, color: p.color }, posiciones, debajo);
+      const resultado = crearPrendaReal(modelo, m, cuerpo, { tipo: p.tipo, contorno: p.contorno, largo: p.largo, color: p.color, seSube: p.seSube }, posiciones, debajo);
       ropa.add(resultado.grupo);
       puestas.push({ abajo, grupo: resultado.grupo });
       coberturas.push(resultado.cobertura);

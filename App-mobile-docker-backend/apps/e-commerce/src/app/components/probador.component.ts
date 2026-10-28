@@ -25,6 +25,7 @@ import {
   MedidasCliente,
   aconsejarTalla,
   colorDePrenda,
+  esPolera,
   estimarCuerpo,
   reescalarMedidas,
   evaluarAjuste,
@@ -108,7 +109,7 @@ const ESTADO_ANCHO = { apretada: 'te queda apretada', justa: 'te queda bien', ho
           <div class="aviso" *ngIf="sinWebgl()">Tu navegador no puede mostrar 3D. La recomendación de talla sigue disponible.</div>
           <div class="aviso" *ngIf="!sinWebgl() && !escena()">Cargando maniquí…</div>
           <div class="ayuda" *ngIf="escena()">Arrastra para girar · pellizca o usa la rueda para acercar</div>
-          <div class="estado" *ngIf="tipo() !== 'cinturon' && ajuste() as a" [attr.data-ancho]="a.ancho">
+          <div class="estado" *ngIf="polera() && ajuste() as a" [attr.data-ancho]="a.ancho">
             Talla {{ a.talla }} · {{ estadoAncho[a.ancho] }}
           </div>
         </div>
@@ -395,22 +396,25 @@ export class ProbadorComponent implements AfterViewInit, OnDestroy {
 
   /** Siempre hay tipo: la tienda solo ofrece Probar en categorías que el probador simula. */
   readonly tipo = computed(() => tipoDePrenda(this.producto().category, this.producto().name) ?? 'polera');
+  /** Por ahora solo las poleras se quedan en su talla al cambiar el peso y aconsejan otra. */
+  readonly polera = computed(() => esPolera(this.tipo()));
   readonly recomendada = computed(() => recomendarTalla(this.cuerpo(), this.tipo()));
   readonly tallas = computed(() =>
     tablaDeTallas(this.tipo()).map(({ talla }) => ({ talla, variante: this.varianteDe(talla) })),
   );
 
   /**
-   * Talla puesta en el maniquí. Se abre con la recomendada y no cambia sola: si el cliente sube de
-   * peso, la misma prenda le queda apretada, como en un probador de verdad, y `consejo` le sugiere
-   * la talla que sí le calza.
+   * Talla puesta en el maniquí. Se abre con la recomendada. En una polera no cambia sola: si el
+   * cliente sube de peso, la misma prenda le queda apretada, como en un probador de verdad, y
+   * `consejo` le sugiere la talla que sí le calza. En las demás prendas, cada vez que la
+   * recomendación cambia (al mover el peso, la altura o las medidas) se vuelve a ella.
    */
   readonly seleccion = signal<string | null>(null);
   readonly tallaElegida = computed(() => this.seleccion() ?? this.recomendada());
   readonly varianteElegida = computed(() => this.varianteDe(this.tallaElegida()));
   readonly ajuste = computed(() => evaluarAjuste(this.cuerpo(), this.tipo(), this.tallaElegida()));
-  /** Subir o bajar de talla, si la puesta no calza; el cinturón es de talla única. */
-  readonly consejo = computed(() => (this.tipo() === 'cinturon' ? null : aconsejarTalla(this.cuerpo(), this.tipo(), this.tallaElegida())));
+  /** Subir o bajar de talla, si la polera puesta no calza. */
+  readonly consejo = computed(() => (this.polera() ? aconsejarTalla(this.cuerpo(), this.tipo(), this.tallaElegida()) : null));
   readonly zonaMedida = computed(() => zonaDeReferencia(this.cuerpo(), this.tipo()));
   /** Talla americana del fabricante, en los pantalones. */
   readonly equivalencia = computed(() => medidasDeTalla(this.tipo(), this.tallaElegida())?.equivalencia ?? null);
@@ -421,7 +425,7 @@ export class ProbadorComponent implements AfterViewInit, OnDestroy {
     const color = colorDePrenda(this.producto().color);
     // La polera manga larga se dibuja con el modelo 3D de manga larga, el del polerón.
     const tipo = this.tipo() === 'polera_manga_larga' ? 'poleron' : this.tipo();
-    return { tipo, contorno: medidas.contornoPrenda, largo: medidas.largo, color };
+    return { tipo, contorno: medidas.contornoPrenda, largo: medidas.largo, color, seSube: this.polera() };
   });
 
   readonly escena = signal<EscenaManiqui | null>(null);
@@ -448,6 +452,17 @@ export class ProbadorComponent implements AfterViewInit, OnDestroy {
         // Sin almacenamiento (modo privado): las medidas duran lo que dure la página.
       }
     });
+
+    // Fuera de las poleras, si la recomendación cambió, la talla puesta pasa a ser la nueva recomendada.
+    let ultimaRecomendada: string | null = null;
+    effect(
+      () => {
+        const recomendada = this.recomendada();
+        if (!this.polera() && ultimaRecomendada !== null && recomendada !== ultimaRecomendada) this.seleccion.set(null);
+        ultimaRecomendada = recomendada;
+      },
+      { allowSignalWrites: true },
+    );
 
     effect(() => this.escena()?.mostrar(this.cuerpo(), this.prendaEnEscena()));
   }

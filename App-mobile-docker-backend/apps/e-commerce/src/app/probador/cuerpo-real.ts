@@ -255,6 +255,8 @@ export interface TallaPrenda {
   /** Largo del cuerpo de la prenda, o largo de pierna en pantalones. */
   largo: number;
   color: string;
+  /** Si la tela se sube cuando la talla no rodea el cuerpo. */
+  seSube?: boolean;
 }
 
 /** Material de cada tipo de prenda, con el relieve de tela del modelo y el color del producto. */
@@ -465,9 +467,8 @@ function ajustarArriba(
 
   // Una talla chica no alcanza a rodear el abdomen: la tela se sube hasta donde el cuerpo todavía
   // cabe en ella (estirándose un poco) y deja ver la piel de más abajo. Si el que no cabe es el
-  // pecho, la tela estirada a lo ancho se acorta. La chaqueta no: es rígida y lleva una camisa
-  // debajo, que se cruzaría con ella; una chaqueta chica se ve ceñida.
-  if (posicionesDelCuerpo && talla.tipo !== 'chaqueta') {
+  // pecho, la tela estirada a lo ancho se acorta. Por ahora solo en la polera que se prueba.
+  if (posicionesDelCuerpo && talla.seSube) {
     const tope = alturaQueNoCabe(posicionesDelCuerpo, pecho, centroZ, brazos, (talla.contorno / 100) * ESTIRAMIENTO);
     const basta = bastaActual - alargue;
     const porAbdomen = tope > basta ? (pecho - tope) / (pecho - basta) : 1;

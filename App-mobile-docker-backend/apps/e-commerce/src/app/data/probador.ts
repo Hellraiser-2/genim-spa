@@ -346,13 +346,21 @@ export function medidasDeTalla(tipo: TipoPrenda, talla: string): MedidasTalla | 
 export type ZonaDeReferencia = 'pecho' | 'abdomen' | 'cintura';
 
 /**
+ * Las poleras, de manga corta o larga. Por ahora solo en ellas el probador deja puesta la talla
+ * al cambiar el peso, la muestra subida si queda chica y aconseja otra.
+ */
+export function esPolera(tipo: TipoPrenda): boolean {
+  return tipo === 'polera' || tipo === 'polera_manga_larga';
+}
+
+/**
  * Dónde se mide el cuerpo para elegir la talla: la cintura en pantalones y cinturones; arriba, el
- * pecho, salvo que el abdomen sea mayor (con más peso la cintura crece más rápido que el pecho):
- * entonces la polera tiene que rodear el abdomen.
+ * pecho, salvo en las poleras cuando el abdomen es mayor (con más peso la cintura crece más
+ * rápido que el pecho): entonces la polera tiene que rodear el abdomen.
  */
 export function zonaDeReferencia(cuerpo: MedidasCuerpo, tipo: TipoPrenda): ZonaDeReferencia {
   if (tipo === 'pantalon' || tipo === 'cinturon') return 'cintura';
-  return cuerpo.cintura > cuerpo.pecho ? 'abdomen' : 'pecho';
+  return esPolera(tipo) && cuerpo.cintura > cuerpo.pecho ? 'abdomen' : 'pecho';
 }
 
 /** El contorno del cuerpo con que se elige la talla (ver `zonaDeReferencia`). */

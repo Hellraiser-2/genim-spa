@@ -289,13 +289,17 @@ describe('recomendarTalla', () => {
     }
   });
 
-  it('arriba elige por el abdomen cuando es mayor que el pecho', () => {
+  it('las poleras eligen por el abdomen cuando es mayor que el pecho', () => {
     const conAbdomen = estimarCuerpo({ altura: 170, peso: 120 });
     expect(conAbdomen.cintura).toBeGreaterThan(conAbdomen.pecho);
     expect(zonaDeReferencia(conAbdomen, 'polera')).toBe('abdomen');
+    expect(zonaDeReferencia(conAbdomen, 'polera_manga_larga')).toBe('abdomen');
     expect(contornoDeReferencia(conAbdomen, 'polera')).toBe(conAbdomen.cintura);
     expect(zonaDeReferencia(MEDIDAS_CUERPO_EJEMPLO, 'polera')).toBe('pecho');
     expect(zonaDeReferencia(conAbdomen, 'pantalon')).toBe('cintura');
+    // Las demás prendas de arriba siguen eligiendo por el pecho.
+    expect(zonaDeReferencia(conAbdomen, 'poleron')).toBe('pecho');
+    expect(zonaDeReferencia(conAbdomen, 'chaqueta')).toBe('pecho');
     // La talla que alcanza para el pecho no rodea el abdomen.
     const porPecho = tablaDeTallas('polera').find((t) => conAbdomen.pecho >= t.desde && conAbdomen.pecho < t.hasta)!.talla;
     expect(evaluarAjuste(conAbdomen, 'polera', porPecho)?.ancho).toBe('apretada');
